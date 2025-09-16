@@ -1,5 +1,9 @@
 package com.inwoo.project.shopback.api.config;
 
+import com.inwoo.project.shopback.api.filter.JwtTokenFilter;
+import com.inwoo.project.shopback.api.user.UserRole;
+import com.inwoo.project.shopback.api.user.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,7 +21,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 	private final UserService userService;
-	private static String secretKey = "my-secret-key-123123";
+
+	@Value("${jwt.secret}")
+	private String secretKey;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -27,14 +33,15 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity
-			.httpBasic().disable()
-			.csrf().disable()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			.and()
+			.httpBasic(httpBasic -> httpBasic.disable())
+			.csrf(csrf -> csrf.disable())
+			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
-			.authorizeRequests()
-			.antMatchers("/jwt-login/info").authenticated()
-			.antMatchers("/jwt-login/admin/**").hasAuthority(UserRole.ADMIN.name())
-			.and().build();
+			.authorizeHttpRequests(auth -> auth
+				.requestMatchers("/jwt-login/info").authenticated()
+				.requestMatchers("/jwt-login/admin/**").hasAuthority(UserRole.ADMIN.name())
+				.anyRequest().permitAll()
+			)
+			.build();
 	}
 }
