@@ -19,7 +19,13 @@ server:
   port: 8080
 
 mybatis:
-  mapper-locations: classpath:mappers/*.xml
-  type-aliases-package: com.inwoo.project.shopback
+  mapper-locations: classpath:api/mapper/*.xml
+  type-aliases-package: com.inwoo.project.shopback.api.user
   configuration:
     map-underscore-to-camel-case: true
+
+# JWT Configuration
+jwt:
+  secret: my-jwt-secret-key-for-shop-back-application-2024
+  access-token-expire-time: 3600000    # 1시간 (1000 * 60 * 60)
+  refresh-token-expire-time: 604800000  # 7일 (1000 * 60 * 60 * 24 * 7)
