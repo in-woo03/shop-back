@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inwoo.project.shopback.api.mapper.UserMapper">
+
+    <resultMap id="userResultMap" type="com.inwoo.project.shopback.api.user.UserDto">
+        <id property="id" column="id"/>
+        <result property="uuid" column="uuid"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="emailVerifiedAt" column="email_verified_at"/>
+        <result property="password" column="password"/>
+        <result property="phone" column="phone"/>
+        <result property="memberLevel" column="member_level"/>
+        <result property="points" column="points"/>
+        <result property="agreeTerms" column="agree_terms"/>
+        <result property="agreeMarketing" column="agree_marketing"/>
+        <result property="lastLoginAt" column="last_login_at"/>
+        <result property="refreshToken" column="refresh_token"/>
+        <result property="refreshTokenExpiresAt" column="refresh_token_expires_at"/>
+        <result property="tokenVersion" column="token_version"/>
+        <result property="emailVerificationToken" column="email_verification_token"/>
+        <result property="passwordResetToken" column="password_reset_token"/>
+        <result property="passwordResetExpires" column="password_reset_expires"/>
+        <result property="userActive" column="user_active"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findById" resultMap="userResultMap">
+        SELECT * FROM users WHERE id = #{id}
+    </select>
+
+    <select id="findByName" resultMap="userResultMap">
+        SELECT * FROM users WHERE name = #{name}
+    </select>
+
+    <select id="findByEmail" resultMap="userResultMap">
+        SELECT * FROM users WHERE email = #{email}
+    </select>
+
+    <select id="findAll" resultMap="userResultMap">
+        SELECT * FROM users ORDER BY created_at DESC
+    </select>
+
+    <insert id="insert" parameterType="com.inwoo.project.shopback.api.user.UserDto" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (
+            uuid, name, email, email_verified_at, password, phone, 
+            member_level, points, agree_terms, agree_marketing, 
+            last_login_at, refresh_token, refresh_token_expires_at, 
+            token_version, email_verification_token, password_reset_token, 
+            password_reset_expires, user_active, created_at, updated_at
+        )
+        VALUES (
+            #{uuid}, #{name}, #{email}, #{emailVerifiedAt}, #{password}, #{phone},
+            #{memberLevel}, #{points}, #{agreeTerms}, #{agreeMarketing},
+            #{lastLoginAt}, #{refreshToken}, #{refreshTokenExpiresAt},
+            #{tokenVersion}, #{emailVerificationToken}, #{passwordResetToken},
+            #{passwordResetExpires}, #{userActive}, NOW(), NOW()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.inwoo.project.shopback.api.user.UserDto">
+        UPDATE users 
+        SET uuid = #{uuid},
+            name = #{name},
+            email = #{email},
+            email_verified_at = #{emailVerifiedAt},
+            password = #{password},
+            phone = #{phone},
+            member_level = #{memberLevel},
+            points = #{points},
+            agree_terms = #{agreeTerms},
+            agree_marketing = #{agreeMarketing},
+            last_login_at = #{lastLoginAt},
+            refresh_token = #{refreshToken},
+            refresh_token_expires_at = #{refreshTokenExpiresAt},
+            token_version = #{tokenVersion},
+            email_verification_token = #{emailVerificationToken},
+            password_reset_token = #{passwordResetToken},
+            password_reset_expires = #{passwordResetExpires},
+            user_active = #{userActive},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM users WHERE id = #{id}
+    </delete>
+
+    <select id="existsByName" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM users WHERE name = #{name}
+    </select>
+
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM users WHERE email = #{email}
+    </select>
+
+    <select id="findByUuid" resultMap="userResultMap">
+        SELECT * FROM users WHERE uuid = #{uuid}
+    </select>
+
+    <select id="findByPhone" resultMap="userResultMap">
+        SELECT * FROM users WHERE phone = #{phone}
+    </select>
+
+    <select id="findByMemberLevel" resultMap="userResultMap">
+        SELECT * FROM users WHERE member_level = #{memberLevel} ORDER BY created_at DESC
+    </select>
+
+    <select id="findActiveUsers" resultMap="userResultMap">
+        SELECT * FROM users WHERE user_active = true ORDER BY created_at DESC
+    </select>
+
+    <select id="findByEmailVerificationToken" resultMap="userResultMap">
+        SELECT * FROM users WHERE email_verification_token = #{emailVerificationToken}
+    </select>
+
+    <select id="findByPasswordResetToken" resultMap="userResultMap">
+        SELECT * FROM users WHERE password_reset_token = #{passwordResetToken}
+    </select>
+
+    <update id="updateLastLoginAt">
+        UPDATE users SET last_login_at = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updatePassword">
+        UPDATE users SET password = #{password}, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateRefreshToken">
+        UPDATE users 
+        SET refresh_token = #{refreshToken}, 
+            refresh_token_expires_at = #{refreshTokenExpiresAt},
+            token_version = #{tokenVersion},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="verifyEmail">
+        UPDATE users 
+        SET email_verified_at = NOW(), 
+            email_verification_token = NULL,
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updatePoints">
+        UPDATE users 
+        SET points = #{points}, 
+            member_level = #{memberLevel},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
